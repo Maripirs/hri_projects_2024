@@ -49,8 +49,8 @@ def talker():
     	msg.x = 3.6
     	msg.y = 1.4
     	msg.z = 5.7
-    	rospy.loginfo(NumCustom)
-    	pub.publish(NumCustom)
+    	rospy.loginfo(msg)
+    	pub.publish(msg)
     	rate.sleep()
 
 if __name__ == '__main__':
