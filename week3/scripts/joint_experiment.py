@@ -40,12 +40,29 @@ def talker():
 
     # set initial angle
 
-    headPitch = Limb("HeadPitch", 0, 0.5, 10)
-    headYaw = Limb("HeadYaw", 0, 0 , 1)
+
+
+    #This one nods	
+    #headPitch = Limb("HeadPitch", 0, 0.5, 10)
+    
+    #This one shakes his head
+    headPitch = Limb("HeadPitch", 0, 0.0, 1)
+    headYaw = Limb("HeadYaw", -0.5, 0.5 , 10)
     
     lShoulderPitch = Limb("LShoulderPitch", 1.35, 1.35, 1)
     #lShoulderPitch = Limb("LShoulderPitch", 0, 0, 1)
     lShoulderRoll = Limb("LShoulderRoll", 0,0, 1)
+    
+    
+    #This one waves the hand. My robot's arms detatch so I can't see it
+    rElbowRoll = Limb("RElboyRoll", -.5, .5 , 10)
+    rShoulderPitch = Limb("RShoulderPitch", -1.30, -1.30, 1)
+    rShoulderRoll = Limb("RShoulderRoll", 1.33, 1.33 , 1) 
+      '''
+    rElbowRoll = Limb("RElboyRoll", 0, 0 , 10)
+    rShoulderPitch = Limb("RShoulderPitch", 0, 0, 1)
+    rShoulderRoll = Limb("RShoulderRoll", 0, 0 , 1)   
+    '''
     
     lHipYawPitch = Limb("LHipYawPitch", 0, 0 , 1)
     lHipRoll = Limb("LHipRoll", 0, 1 , 10)
@@ -59,13 +76,11 @@ def talker():
     rAnklePitch = Limb("RAnklePitch", 0, 0 , 1)
     rAnkleRoll = Limb("RAnkleRoll", 0, 0 , 1)
     lElbowYaw = Limb("LElbowYaw", 0, 1 , 10)
-    lElbowRoll = Limb("LElboyRoll", 0, 1 , 10)
+    lElbowRoll = Limb("LElboyRoll", 0,0 , 1)
     lWristYaw = Limb("LWristYaw", 0, 0 , 1)
     lHand = Limb("LHand", 0, 0 , 1)
-    rShoulderPitch = Limb("RShoulderPitch", 0, 0, 1)
-    rShoulderRoll = Limb("RShoulderRoll", 0, 0 , 1)
+
     rElbowYaw = Limb("RElbowYaw", 0, 1 , 10)
-    rElbowRoll = Limb("RElboyRoll", 0, 1 , 10)
     rWristYaw = Limb("RWristYaw", 0, 0 , 1)
     rHand = Limb("RHand", 0, 0 , 1)
 
