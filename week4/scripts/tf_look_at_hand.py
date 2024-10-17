@@ -69,7 +69,9 @@ if __name__ == '__main__':
 
         js = js_global
         try:
-            trans = tfBuffer.lookup_transform('torso', 'l_gripper', rospy.Time())
+        #SWAP THESE COMMENTS FOR Look at hand vs look at where it's pointing
+            #trans = tfBuffer.lookup_transform('torso', 'l_gripper', rospy.Time())
+            trans = tfBuffer.lookup_transform('torso', 'pointing', rospy.Time())
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
             rate.sleep()
             continue
@@ -79,7 +81,10 @@ if __name__ == '__main__':
 
 
         try:
-            trans2 = tfBuffer.lookup_transform('Head', 'l_gripper', rospy.Time())
+        
+        #SWAP THESE COMMENTS FOR Look at hand vs look at where it's pointing
+            #trans2 = tfBuffer.lookup_transform('Head', 'l_gripper', rospy.Time())
+            trans2 = tfBuffer.lookup_transform('Head', 'pointing', rospy.Time())
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
             rate.sleep()
             continue

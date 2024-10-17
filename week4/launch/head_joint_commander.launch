@@ -6,6 +6,8 @@
 		<remap from="joint_states" to="joint_states_original"/>
 	</node>
 		
+	  
+   	<node pkg="week4" type="hand_pointing.py" name="hand_pointing" />
 
 
 	<!-- additionally load the robot state publisher -->
