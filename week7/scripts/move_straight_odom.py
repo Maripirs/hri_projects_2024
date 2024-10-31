@@ -37,7 +37,7 @@ if __name__ == '__main__':
     t = Twist()
     t.linear.x = 1.0
     n.pub.publish(t)
-
+	
     while not rospy.is_shutdown():
 
         # maintain current rate
@@ -56,6 +56,7 @@ if __name__ == '__main__':
 
         if dist > 1.0:
             t.linear.x = 0.0
+            t.angular.z = 0.3
             n.pub.publish(t)
             break
 

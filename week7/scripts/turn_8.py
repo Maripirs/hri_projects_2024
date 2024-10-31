@@ -63,35 +63,42 @@ if __name__ == '__main__':
 
     # start the robot's movement
     t = Twist()
-    t.angular.z = 0.5
+    t.angular.z = 1
     t.linear.x = 1.5
     n.pub.publish(t)
-
-    while not rospy.is_shutdown():
-
-        # maintain current rate
-        n.pub.publish(t)
-
-        # get current odom
-        cur = n.get_yaw(n.get_odom())
-        diff = math.fabs(cur - prev)
-        #if diff > math.pi:
-        #    diff -= 2 * math.pi
-        prev = cur
-        
-
-        # is distance greater than 1 rad?
-        # distance
-        sum_turn += diff
-        print(sum_turn)
-
-        if sum_turn > math.pi * 2:
-            t.angular.z = 0.0
-            t.linear.x = 0.0
+    for i in range(2):
+        if i == 1:
+            t.angular.z = -1
+            t.linear.x = 1.5
             n.pub.publish(t)
-            break
+            sum_turn = 0
+        while not rospy.is_shutdown():
 
-        rate.sleep()
+            # maintain current rate
+            n.pub.publish(t)
+
+            # get current odom
+            cur = n.get_yaw(n.get_odom())
+            diff = math.fabs(cur - prev)
+            
+             
+            if diff > math.pi:
+                diff -= 2 * math.pi
+            prev = cur
+            
+
+            # is distance greater than 1 rad?
+            # distance
+            sum_turn += diff
+            print(sum_turn)
+
+            if sum_turn > math.pi * 2:
+                t.angular.z = 0.0
+                t.linear.x = 0.0
+                n.pub.publish(t)
+                break
+
+            rate.sleep()
 
     t.angular.z = 0.0
     t.linear.x = 0.0
