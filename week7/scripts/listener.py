@@ -39,13 +39,7 @@ import rospy
 from std_msgs.msg import String
 from sensor_msgs.msg import LaserScan
 
-def find_min(ranges):
-    min = 100
-    for range in ranges:
-        if range < min:
-            min = range
-    print(min)
-        
+
 
 def callback(data):
   #  rospy.loginfo(rospy.get_caller_id() + 'I heard x = %s, y = %s, z = %s', data.x, data.y, data.z)
@@ -59,7 +53,7 @@ def callback(data):
     # print(f'data.ranges {data.ranges}') 
     # print(f'data.intensities {data.intensities}') 
     
-    find_min(data.ranges)
+    print(min(data.ranges))
 
 def listener():
 
