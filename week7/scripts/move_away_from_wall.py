@@ -21,8 +21,10 @@ class MoveStraightOdom:
         self.sub = rospy.Subscriber("/odom", Odometry, self.odom_callback)
         self.laser = rospy.Subscriber("/base_scan", LaserScan, self.laser_calback)
         rospy.sleep( rospy.Duration.from_sec(0.5) )
-        self.closer_scan = 10
-        self.farthest_wall_idx = 0
+        self.clear_direction = 1
+
+        self.closer_wall = 10
+        self.clear_choice = 'front'
 
     def odom_callback(self, msg):
         self.odom = msg
@@ -32,23 +34,26 @@ class MoveStraightOdom:
         (roll, pitch, yaw) = euler_from_quaternion (orientation_list)
         return yaw
     def laser_calback(self, data):
-        min = 100
-        max = 0
-        clearIdx = 0
-        for i, range in enumerate(data.ranges):
-            if range < min:
-                min = range
-            if range > max:
-                max = range
-                if data.ranges[i+1] == max and data.ranges[i+2] == max:
-                    clearIdx = i+1
-                
-                
 
+        right = min(data.ranges[:360])
+    
+        front = min(data.ranges[361:720])
+        left = min(data.ranges[721:])
+
+        if right > 5:
+
+            self.clear_direction = -1
+            self.clear_choice = 'right'
+
+        elif left > 5:
+
+            self.clear_direction = 1
+            self.clear_choice = 'left'
         #There's 1081 scans
-        self.closer_scan = min
-        self.farthest_wall_idx = clearIdx
-        print(f'clear at index: {clearIdx}')
+        
+        self.closer_wall = min(left, front,  right)
+
+
     
     def get_odom(self):
         return self.odom
@@ -67,7 +72,7 @@ if __name__ == '__main__':
 
     # start the robot's movement
     t = Twist()
-    t.linear.x = 1.0
+    t.linear.x = 5.0
     n.pub.publish(t)
     start_twist = n.get_yaw(n.get_odom())
     prev_twist = start_twist
@@ -81,14 +86,16 @@ if __name__ == '__main__':
         if moving:
             
             n.get_laser()
-            closer_wall = n.closer_scan
-            print(f'closer wall: {closer_wall}')
+            closer_wall = n.closer_wall
             if closer_wall < 1:
+                print(f'Changing directions to : {n.clear_choice}')
                 t.linear.x = 0.0
-                t.angular.z = 0.5
                 n.pub.publish(t)
                 moving = False
+                t.angular.z = 0.5 * n.clear_direction
+                n.pub.publish(t)
                 twisting = True
+                
             
         if twisting:
             cur_twist = n.get_yaw(n.get_odom())
@@ -97,11 +104,11 @@ if __name__ == '__main__':
             if diff > math.pi:
                 diff -= 2 * math.pi
             sum_turn += diff
-            print(f'sum_turn : {sum_turn}')
-            if sum_turn > math.radians(180):
+            if sum_turn > math.radians(90):
                 t.angular.z = 0.0
-                t.linear.x = 1.0
+                t.linear.x = 5.0
                 start_twist = cur_twist
+                sum_turn = 0
                 n.pub.publish(t)
                 twisting = False
                 moving = True

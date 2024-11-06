@@ -60,7 +60,20 @@ if __name__ == '__main__':
             if moving:
                 print("walking")
             # is distance greater than 1m?
-                dx = cur_move.pose.pose.position.x - start_move.pose.pose.position.x
+                dx = cur_move.pose.pose            diff = math.fabs(cur_twist - prev_twist)
+            prev_twist = cur_twist
+            if diff > math.pi:
+                diff -= 2 * math.pi
+            sum_turn += diff
+            print(sum_turn)
+            if sum_turn > math.radians(180):
+                t.angular.z = 0.0
+                t.linear.x = 1.0
+                start_move = cur_move
+                start_twist = cur_twist
+                n.pub.publish(t)
+                twisting = False
+                moving = True.position.x - start_move.pose.pose.position.x
                 dy = cur_move.pose.pose.position.y - start_move.pose.pose.position.y
 
             # distance
