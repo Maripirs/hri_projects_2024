@@ -41,10 +41,10 @@ class MoveStraightOdom:
         return yaw
     def laser_calback(self, data):
 
-        right = min(data.ranges[:360])
+        right = min(data.ranges[:400])
     
-        front = min(data.ranges[361:720])
-        left = min(data.ranges[721:])
+        front = min(data.ranges[401:600])
+        left = min(data.ranges[601:])
 
         if right > 5:
 
@@ -98,9 +98,6 @@ if __name__ == '__main__':
     # figure out where we started from
     start = n.get_odom()
 
-    #get starting angle for the person
-
-
 
     # start the robot's movement
     t = Twist()
@@ -128,57 +125,50 @@ if __name__ == '__main__':
                 person_found = True
                 target_angle = abs(n.person_angle)
                 direction =  1 if n.person_angle > 0 else -1 
-                print(f"Found a person, starting Twist to {target_angle}")
+                print(f"Identified a person, starting Twist to {target_angle}")
                 moving = False
                 t.linear.x = 0
                 t.angular.z = .2 * direction
                 twisting = True
         if moving:
             dx = cur_move.pose.pose.position.x - start_move.pose.pose.position.x
-            dy = cur_move.pose.pose.position.y - start_move.pose.pose.position.x
+            dy = cur_move.pose.pose.position.y - start_move.pose.pose.position.y
             dist = math.sqrt( dx*dx + dy*dy )
             n.get_laser()
             closer_wall = n.closer_wall
-            print(n.person_distance)
-            print(f'distance = {dist}')
-            if dist > 3:
+            if dist > 2:
                 print("Re checking for person")
-                print(f"cur_move.x = {cur_move.pose.pose.position.x}, start_move.x {start_move.pose.pose.position.x}")
-                print(f"cur_move.y = {cur_move.pose.pose.position.y}, start_move.y {start_move.pose.pose.position.y}")
+                
                 person_found = False
-                start_move = n.get_odom()
+
             if closer_wall < 1 :
-                start_move = n.get_odom()
-                print("Found something")
+
+                print("We're about to hit something")
                 t.linear.x = 0.0
                 n.pub.publish(t)
                 moving = False
                 if n.person_distance > 2:
-                    print(f'Changing directions to : {n.clear_choice}')
+                    print(f'Not a person. Turning {n.clear_choice} to avoid obstacle')
                     t.angular.z = 0.2 * n.clear_direction
                     n.pub.publish(t)
-                    obstacle = 2
+                    obstacle = 1
                     twisting = True
                 else:
-                    print('Found a person')
+                    print('Found The Person!')
                     t.linear.x = 0
                     t.angular.z = 0
-                    start_move = n.get_odom()
                     moving = False
                     twisting = False
                     person_found = True
             elif obstacle and dist > 1:
-                print(f"obstacle {obstacle}")
-                start_move = n.get_odom()
                 t.linear.x = 0.0
                 n.pub.publish(t)
                 moving = False
                 print(f'Changing directions to : {n.clear_choice}')
                 t.angular.z = 0.2 * n.clear_direction
                 n.pub.publish(t)
-                obstacle -= 1
-                if obstacle == 0:
-                    person_found = False
+                obstacle = 0
+                person_found = False
                 twisting = True
                 
                 
@@ -187,7 +177,7 @@ if __name__ == '__main__':
         if twisting:
 
             if obstacle:
-                target_angle = math.radians(90)
+                target_angle = math.radians(50)
             cur_twist = n.get_yaw(n.get_odom())
             diff = math.fabs(cur_twist - prev_twist)
             prev_twist = cur_twist
