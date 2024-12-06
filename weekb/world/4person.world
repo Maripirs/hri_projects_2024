@@ -12,21 +12,22 @@ resolution 0.02
 # configure the GUI window
 window
 (
-  size [ 1019 1059 ] # in pixels
+  size [ 1848 1016 ] # in pixels
   scale 33.632   # pixels per meter
-  center [ 2.690  3.288 ]
-  rotate [ 0.000  0.000 ]
+  center [ 4.173  10.740 ]
+  rotate [ 34.000  -205.500 ]
         
   show_data 1              # 1=on 0=off
 )
 
 # load an environment bitmap
 floorplan
+
 ( 
-  name "room"
-  bitmap "basic_map.pgm"
-  size [35.000 35.000 0.500]
-   pose [ 0.000 0.000 0.000 90.000 ]
+   name "room"
+   bitmap "basic_map.pgm"
+   size [1000.000 1000.000 0.500]
+   pose [ 100.000 0.000 0.000 90.000 ]
 )
 
 
@@ -57,11 +58,11 @@ define erratic position
 )
 
 # throw in a robot
-erratic( pose [ -6.819 5.013 0.000 149.450 ] name "pioneer" )
+erratic( pose [ -5.868 2.129 0.000 126.532 ] name "pioneer" )
 #block( pose [ -3.02 -8.88 0.000 180.000 ] color "green")
 
 
 
-person ( name "r0" pose [ -8.770 9.909 0.000 88.935 ] localization "gps" localization_origin [ 0 0 0 0 ] )
-person ( name "r1" pose [ -7.088 11.276 0.000 -2.738 ] localization "gps" localization_origin [ 0 0 0 0 ] )
-person ( name "r2" pose [ -5.421 9.909 0.000 -88.682 ] localization "gps" localization_origin [ 0 0 0 0 ] )
+person ( name "r0" pose [ -6.503 5.610 0.000 -14.285 ] localization "gps" localization_origin [ 0 0 0 0 ] )
+person ( name "r1" pose [ -9.264 3.963 0.000 99.166 ] localization "gps" localization_origin [ 0 0 0 0 ] )
+person ( name "r2" pose [ -4.705 5.700 0.000 174.389 ] localization "gps" localization_origin [ 0 0 0 0 ] )
