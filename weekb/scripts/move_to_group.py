@@ -9,7 +9,7 @@ from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import LaserScan
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
-from people_msgs.msg import PositionMeasurementArray
+from weekb.msg import GroupInfo
 
 # this is based on the Robotics Back-End: https://roboticsbackend.com/oop-with-ros-in-python/
 
@@ -20,14 +20,14 @@ class MoveStraightOdom:
         self.pub = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
         self.sub = rospy.Subscriber("/odom", Odometry, self.odom_callback)
         self.laser = rospy.Subscriber("/base_scan", LaserScan, self.laser_calback)
-        self.person = rospy.Subscriber("/people_tracker_measurements", PositionMeasurementArray, self.person_callback)
+        self.group = rospy.Subscriber("/group_info", GroupInfo, self.group_callback)
         rospy.sleep( rospy.Duration.from_sec(0.5) )
         self.clear_direction = 1
 
         self.closer_wall = 10
         self.clear_choice = 'front'
         self.target_angle = 0
-        self.person_distance = 100
+        self.group_distance = 100
         self.count = 1
         self.tfBuffer = tf2_ros.Buffer()
         listener = tf2_ros.TransformListener(self.tfBuffer)
@@ -58,17 +58,18 @@ class MoveStraightOdom:
         #There's 1081 scans
         
         self.closer_wall = min(left, front,  right)
-    def person_callback(self, data):
-        if data.people:
+    def group_callback(self, data):
+        print(data)
+        if data.group_type == 'Line' or data.group_type == 'Circle':
             
-            trans = self.tfBuffer.lookup_transform('base_link', data.people[0].name, rospy.Time())
+            trans = self.tfBuffer.lookup_transform('robot_0/base_link', 'group', rospy.Time())
 
             # print(f'Person from base_link {trans.transform.translation.x}, {trans.transform.translation.y}')
 
 
             dx = trans.transform.translation.x
             dy = trans.transform.translation.y
-            self.person_distance = math.sqrt( dx*dx + dy*dy )
+            self.group_distance = math.sqrt( dx*dx + dy*dy )
             # print(f'Pioneer coordinates are {self.odom.pose.pose.position.x}, {self.odom.pose.pose.position.y}')
             # print(f'Person is x:{dx} y: {dy} . {person_distance}m distance')
             self.target_angle = math.atan2(dy, dx) 
@@ -136,10 +137,6 @@ if __name__ == '__main__':
             dist = math.sqrt( dx*dx + dy*dy )
             n.get_laser()
             closer_wall = n.closer_wall
-            if dist > 2:
-                print("Re checking for person")
-                
-                target_found = False
 
             if closer_wall < 1 :
 
@@ -147,8 +144,8 @@ if __name__ == '__main__':
                 t.linear.x = 0.0
                 n.pub.publish(t)
                 moving = False
-                if n.person_distance > 2:
-                    print(f'Not a person. Turning {n.clear_choice} to avoid obstacle')
+                if n.group_distance > 1:
+                    print(f'Not near target. Turning {n.clear_choice} to avoid obstacle')
                     t.angular.z = 0.2 * n.clear_direction
                     n.pub.publish(t)
                     obstacle = 1

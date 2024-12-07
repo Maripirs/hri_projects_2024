@@ -13,43 +13,22 @@ def find_point(x1, y1, x2, y2, d):
     print(f'person 2 location: {x2}, {y2}')
     dx = x2 - x1
     dy = y2 - y1
-
-    
-    # Debug output
     print(f"Direction vector: dx = {dx}, dy = {dy}")
-    
-    # Step 2: Calculate the magnitude of the direction vector
     magnitude = math.sqrt(dx**2 + dy**2)
-    
-    # Debug output
     print(f"Magnitude of the direction vector: {magnitude}")
-    
     if magnitude == 0:
         print("Error: The two points are coincident (same location). Cannot extend line.")
         return x2, y2  # Can't extend, return the same point
-    
-    # Step 3: Normalize the direction vector (to length 1)
     unit_dx = dx / magnitude
     unit_dy = dy / magnitude
-    
-    # Debug output
     print(f"Normalized direction: unit_dx = {unit_dx}, unit_dy = {unit_dy}")
-    
-    # Step 4: Scale the normalized direction vector by distance d
     print (f'Distance {d}')
     extended_dx = unit_dx * d
     extended_dy = unit_dy * d
-    
-    # Debug output
     print(f"Extended vector: extended_dx = {extended_dx}, extended_dy = {extended_dy}")
-    
-    # Step 5: Calculate the new coordinates of the extended point
     x3 = x2 + extended_dx
     y3 = y2 + extended_dy
-    
-    # Debug output
-    print(f"Extended point: x3 = {x3}, y3 = {y3}")
-    
+    print(f"Extended point: x3 = {x3}, y3 = {y3}")  
     return (x3, y3)
 
 class groupDetector:
@@ -57,8 +36,8 @@ class groupDetector:
         self.pub = rospy.Publisher("/robot0/detected_groups", PositionMeasurementArray, queue_size = 10)
         self.sub = rospy.Subscriber("/people_tracker_measurements", PositionMeasurementArray, self.group_callback)
         rospy.sleep( rospy.Duration.from_sec(0.5) )
-        self.group_pub = rospy.Publisher("/group_info", GroupInfo, queue_size=10)
-        self.msg = GroupInfo
+        self.group_pub = rospy.Publisher("group_info", GroupInfo, queue_size=10)
+        self.msg = GroupInfo()
         self.group = "NONE"
         self.counter = 1
         self.people = []
@@ -85,7 +64,7 @@ class groupDetector:
             self.group = "Circle"
             self.msg.group_type = "Circle"
             self.msg.x = xc
-            self.msg.y = xy
+            self.msg.y = yc
             self.msg.r = r
             self.relevant_location = [xc,yc, 0]
             self.radius = r
@@ -133,9 +112,9 @@ class groupDetector:
                     self.relevant_location = [x3, y3, 0]
                     self.msg.group_type = "Line"
                     self.msg.x = x3
-                    self.msg.y = x3
+                    self.msg.y = y3
                     self.msg.r = 0
-        self.group_pub(self.msg)
+        self.group_pub.publish(self.msg)
                         
                 
                 
@@ -167,7 +146,7 @@ class groupDetector:
             self.counter = 0
 
         hp = tf.TransformBroadcaster()
-        hp.sendTransform(self.relevant_location,tf.transformations.quaternion_from_euler(0, 0, 0),rospy.Time.now(),self.group,'odom')
+        hp.sendTransform(self.relevant_location,tf.transformations.quaternion_from_euler(0, 0, 0),rospy.Time.now(),'group','odom')
         for person in data.people:
             person_idx = self.find_person(person)
             if person_idx == -1 and len(self.people) < 3:
