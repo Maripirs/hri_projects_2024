@@ -32,6 +32,7 @@ class MoveStraightOdom:
         self.tfBuffer = tf2_ros.Buffer()
         self.group_type = "NONE"
         listener = tf2_ros.TransformListener(self.tfBuffer)
+        self.found_group = False
 
     def odom_callback(self, msg):
         self.odom = msg
@@ -60,15 +61,11 @@ class MoveStraightOdom:
         
         self.closer_wall = min(left, front,  right)
     def group_callback(self, data):
-        if self.count > 20:
-        	self.count = 0
-        elif self.count > 0:
-        	self.count += 1
-		
-	
-        if self.count == 0 and (data.group_type == 'Line' or data.group_type == 'Circle'):
-            self.count = 1
+
+        if self.found_group == False and (data.group_type == 'Line' or data.group_type == 'Circle'):
+
             self.group_type = data.group_type
+            self.found_group = True
             trans = self.tfBuffer.lookup_transform('robot_0/base_link', 'group', rospy.Time())
 
             # print(f'Person from base_link {trans.transform.translation.x}, {trans.transform.translation.y}')
@@ -145,7 +142,7 @@ if __name__ == '__main__':
             dist = math.sqrt( dx*dx + dy*dy )
             n.get_laser()
             closer_wall = n.closer_wall
-            if n.group_distance < 0.5:
+            if n.group_distance - dist < 0.5:
             	print("We're here")
             	t.linear.x = 0.0
             	n.pub.publish(t)
@@ -171,6 +168,7 @@ if __name__ == '__main__':
                     target_found = True
             elif obstacle and dist > 1:
                 t.linear.x = 0.0
+                target_found = False
                 n.pub.publish(t)
                 moving = False
                 print(f'Changing directions to : {n.clear_choice}')
@@ -178,13 +176,14 @@ if __name__ == '__main__':
                 n.pub.publish(t)
                 obstacle = 0
                 target_found = False
+                n.found_group = False
                 twisting = True
                 
                 
                 
             
         if twisting:
-            print("twisting")
+            #print("twisting")
             if obstacle:
                 target_angle = math.radians(50)
             cur_twist = n.get_yaw(n.get_odom())
@@ -193,7 +192,7 @@ if __name__ == '__main__':
             if diff > math.pi:
                 diff -= 2 * math.pi
             sum_turn += diff
-            print(f'target turn = {target_angle}, sum = {sum_turn}')
+            #print(f'target turn = {target_angle}, sum = {sum_turn}')
             if sum_turn > target_angle:
                 print("Completed turn")
                 t.angular.z = 0.0

@@ -59,7 +59,7 @@ class groupDetector:
             return
         xc, yc, r, sigma = taubinSVD(point_coordinates)
         print(f'Circle center x:{xc}  y:{yc}, radius: {r}')
-        if (r < 4):
+        if (r < 5):
             print("We have a circle")
             self.group = "Circle"
             self.msg.group_type = "Circle"
