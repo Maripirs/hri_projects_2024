@@ -138,6 +138,7 @@ class groupDetector:
         print(f'Callbacking {self.counter}')
         self.counter += 1
         self.people = []
+        print(data.people)
         if len(data.people) == 0:
             return
         person = data.people[0]
@@ -146,10 +147,11 @@ class groupDetector:
             self.counter = 0
 
         hp = tf.TransformBroadcaster()
-        hp.sendTransform(self.relevant_location,tf.transformations.quaternion_from_euler(0, 0, 0),rospy.Time.now(),'group','odom')
+        hp.sendTransform(self.relevant_location,tf.transformations.quaternion_from_euler(0, 0, 0),rospy.Time.now(),'group','robot_0/odom')
         for person in data.people:
             person_idx = self.find_person(person)
             if person_idx == -1 and len(self.people) < 3:
+            #if len(self.people) < 3:
                 self.people.append(person)
         self.group_type()
         

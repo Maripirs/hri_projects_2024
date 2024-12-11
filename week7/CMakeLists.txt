@@ -13,7 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   stage_ros
   std_msgs
   week0
-  week7
+#  week7
   message_generation
 )
 
